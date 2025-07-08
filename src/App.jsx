@@ -1,17 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import ClassificationTable from './components/ClassificationTable';
+import FilterControls from './components/FilterControls';
 import { getClassifications, updateClassification } from './services/api';
 import './App.css';
 
 function App() {
     const [documents, setDocuments] = useState([]);
+    const [filteredDocuments, setFilteredDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [filters, setFilters] = useState({
+        type: '',
+        minConfidence: 0,
+        maxConfidence: 1,
+        showLowConfidence: false
+    });
 
     // Load documents on component mount
     useEffect(() => {
         loadDocuments();
     }, []);
+
+    // Apply filters when documents or filters change
+    useEffect(() => {
+        applyFilters();
+    }, [documents, filters]);
 
     const loadDocuments = async () => {
         try {
@@ -25,6 +38,39 @@ function App() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const applyFilters = () => {
+        let filtered = [...documents];
+
+        // Filter by classification type
+        if (filters.type) {
+            filtered = filtered.filter(doc =>
+                doc.classifications.some(c =>
+                    c.label.toLowerCase().includes(filters.type.toLowerCase())
+                )
+            );
+        }
+
+        // Filter by confidence range
+        filtered = filtered.filter(doc => {
+            const maxScore = Math.max(...doc.classifications.map(c => c.score));
+            return maxScore >= filters.minConfidence && maxScore <= filters.maxConfidence;
+        });
+
+        // Filter for low confidence documents
+        if (filters.showLowConfidence) {
+            filtered = filtered.filter(doc => {
+                const maxScore = Math.max(...doc.classifications.map(c => c.score));
+                return maxScore < 0.7;
+            });
+        }
+
+        setFilteredDocuments(filtered);
+    };
+
+    const handleFilterChange = (newFilters) => {
+        setFilters(prev => ({ ...prev, ...newFilters }));
     };
 
     const handleUpdateClassification = async (documentId, newClassifications) => {
@@ -91,8 +137,15 @@ function App() {
             )}
 
             <main className="app-main">
+                <FilterControls
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    totalCount={documents.length}
+                    filteredCount={filteredDocuments.length}
+                />
+
                 <ClassificationTable
-                    documents={documents}
+                    documents={filteredDocuments}
                     onUpdateClassification={handleUpdateClassification}
                 />
             </main>
