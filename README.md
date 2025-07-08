@@ -1,5 +1,5 @@
 # Document Classifier Dashboard - Frontend
-
+![Document Classifier](./src/assets/doc-class.png)
 React application for managing AI document classifications with real-time filtering and editing capabilities.
 
 ## Features
