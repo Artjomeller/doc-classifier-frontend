@@ -8,6 +8,7 @@ React application for managing AI document classifications with real-time filter
 - **Advanced Filtering** by classification type and confidence range
 - **Modal-based Editing** with score normalization
 - **Low Confidence Highlighting** (< 70%) with visual warnings
+- **Undo Functionality** 30-second window to revert changes after an edit
 - **Responsive Design** optimized for all screen sizes
 
 ## Tech Stack
