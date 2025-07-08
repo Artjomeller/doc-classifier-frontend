@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import EditModal from './EditModal';
 import { getPrimaryClassification, isLowConfidence, formatConfidence } from '../services/api';
 
 const ClassificationTable = ({ documents, onUpdateClassification }) => {
+    const [editingDocument, setEditingDocument] = useState(null);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
     const handleSort = (key) => {
@@ -68,9 +70,19 @@ const ClassificationTable = ({ documents, onUpdateClassification }) => {
     };
 
     const handleEditClick = (document) => {
-        // Placeholder - will implement modal later
-        console.log('Edit clicked for:', document.document_name);
-        alert(`Edit functionality coming soon!\nDocument: ${document.document_name}`);
+        setEditingDocument(document);
+    };
+
+    const handleCloseEdit = () => {
+        setEditingDocument(null);
+    };
+
+    const handleSaveEdit = async (documentId, newClassifications) => {
+        const success = await onUpdateClassification(documentId, newClassifications);
+        if (success) {
+            setEditingDocument(null);
+        }
+        return success;
     };
 
     const sortedDocuments = getSortedDocuments();
@@ -203,6 +215,14 @@ const ClassificationTable = ({ documents, onUpdateClassification }) => {
                     </tbody>
                 </table>
             </div>
+
+            {editingDocument && (
+                <EditModal
+                    document={editingDocument}
+                    onClose={handleCloseEdit}
+                    onSave={handleSaveEdit}
+                />
+            )}
         </div>
     );
 };

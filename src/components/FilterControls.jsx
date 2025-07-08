@@ -45,6 +45,21 @@ const FilterControls = ({ filters, onFilterChange, totalCount, filteredCount }) 
         'Other'
     ];
 
+    // Confidence options (0% to 100% in 10% steps)
+    const confidenceOptions = [
+        { value: 0, label: '0%' },
+        { value: 0.1, label: '10%' },
+        { value: 0.2, label: '20%' },
+        { value: 0.3, label: '30%' },
+        { value: 0.4, label: '40%' },
+        { value: 0.5, label: '50%' },
+        { value: 0.6, label: '60%' },
+        { value: 0.7, label: '70%' },
+        { value: 0.8, label: '80%' },
+        { value: 0.9, label: '90%' },
+        { value: 1, label: '100%' }
+    ];
+
     return (
         <div className="filter-controls">
             <div className="filter-header">
@@ -80,30 +95,32 @@ const FilterControls = ({ filters, onFilterChange, totalCount, filteredCount }) 
 
                 <div className="filter-group">
                     <label htmlFor="min-confidence">Min Confidence:</label>
-                    <input
+                    <select
                         id="min-confidence"
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
                         value={localFilters.minConfidence}
                         onChange={(e) => handleInputChange('minConfidence', parseFloat(e.target.value))}
-                    />
-                    <span className="range-value">{(localFilters.minConfidence * 100).toFixed(0)}%</span>
+                    >
+                        {confidenceOptions.map(option => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="filter-group">
                     <label htmlFor="max-confidence">Max Confidence:</label>
-                    <input
+                    <select
                         id="max-confidence"
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
                         value={localFilters.maxConfidence}
                         onChange={(e) => handleInputChange('maxConfidence', parseFloat(e.target.value))}
-                    />
-                    <span className="range-value">{(localFilters.maxConfidence * 100).toFixed(0)}%</span>
+                    >
+                        {confidenceOptions.map(option => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="filter-group">
