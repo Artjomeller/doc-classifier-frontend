@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ClassificationTable from './components/ClassificationTable';
 import FilterControls from './components/FilterControls';
-import { getClassifications, updateClassification } from './services/api';
+import UndoNotification from './components/UndoNotification';
+import { getClassifications, updateClassification, undoClassification } from './services/api';
 import './App.css';
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
     const [filteredDocuments, setFilteredDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [undoNotification, setUndoNotification] = useState(null);  // NEW
     const [filters, setFilters] = useState({
         type: '',
         minConfidence: 0,
@@ -73,6 +75,7 @@ function App() {
         setFilters(prev => ({ ...prev, ...newFilters }));
     };
 
+    // UPDATED: Handle update with undo support
     const handleUpdateClassification = async (documentId, newClassifications) => {
         try {
             const updatedDoc = await updateClassification(documentId, {
@@ -86,12 +89,49 @@ function App() {
                 )
             );
 
+            // NEW: Show undo notification if backend supports it
+            if (updatedDoc.canUndo) {
+                const document = documents.find(d => d.id === documentId);
+                setUndoNotification({
+                    documentId,
+                    documentName: document?.document_name || 'Document',
+                    timestamp: Date.now()
+                });
+            }
+
             return true;
         } catch (err) {
             console.error('Error updating classification:', err);
             setError('Failed to update classification');
             return false;
         }
+    };
+
+    // NEW: Handle undo
+    const handleUndo = async () => {
+        if (!undoNotification) return;
+
+        try {
+            const undoResult = await undoClassification(undoNotification.documentId);
+
+            // Update local state with undone data
+            setDocuments(prev =>
+                prev.map(doc =>
+                    doc.id === undoNotification.documentId ? undoResult.data : doc
+                )
+            );
+
+            setUndoNotification(null);
+            setError(null);
+        } catch (err) {
+            console.error('Error undoing changes:', err);
+            setError('Failed to undo changes: ' + err.message);
+        }
+    };
+
+    // NEW: Handle dismiss undo
+    const handleDismissUndo = () => {
+        setUndoNotification(null);
     };
 
     const getLowConfidenceCount = () => {
@@ -149,6 +189,16 @@ function App() {
                     onUpdateClassification={handleUpdateClassification}
                 />
             </main>
+
+            {/* NEW: Undo notification */}
+            {undoNotification && (
+                <UndoNotification
+                    documentName={undoNotification.documentName}
+                    onUndo={handleUndo}
+                    onDismiss={handleDismissUndo}
+                    duration={30000}
+                />
+            )}
         </div>
     );
 }

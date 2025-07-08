@@ -197,21 +197,17 @@ body {
 
 /* Mobile-Optimized Dropdowns */
 .filter-group select {
-  padding: 0.75rem;
   border: 2px solid #cbd5e0;
   border-radius: 0.5rem;
   font-size: 1rem;
-  background: white;
   color: #2d3748;
   font-weight: 500;
   cursor: pointer;
   min-height: 44px; /* Touch target minimum */
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234a5568' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.75rem center;
-  background-repeat: no-repeat;
+  background: white url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234a5568' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") no-repeat right 0.75rem center;
   background-size: 1.25em 1.25em;
-  padding-right: 2.5rem;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
 }
 
 .filter-group select:focus {
@@ -874,7 +870,7 @@ table {
 
   .app-main {
     padding: 2rem;
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
   }
 
@@ -929,7 +925,7 @@ table {
 /* ===== LARGE DESKTOP (1400px+) ===== */
 @media (min-width: 1400px) {
   .app-main {
-    max-width: 1400px;
+    max-width: 1800px;
     padding: 2.5rem 3rem;
   }
 
@@ -953,54 +949,184 @@ table {
   th:nth-child(6), td:nth-child(6) { width: 7%; }
 }
 
-/* ===== PORTRAIT ORIENTATION ===== */
-@media (orientation: portrait) and (min-width: 900px) and (min-height: 1400px) {
-  .filter-row {
-    grid-template-columns: repeat(2, 1fr);
+/* ===== EXTRA LARGE MONITORS (1920px+) ===== */
+@media (min-width: 1920px) {
+  .app-main {
+    max-width: 2200px;
+    padding: 3rem 4rem;
   }
 
-  th:nth-child(1), td:nth-child(1) { width: 19%; }
-  th:nth-child(2), td:nth-child(2) { width: 15%; }
-  th:nth-child(3), td:nth-child(3) { width: 9%; }
-  th:nth-child(4), td:nth-child(4) { width: 33%; }
-  th:nth-child(5), td:nth-child(5) { width: 14%; }
-  th:nth-child(6), td:nth-child(6) { width: 10%; }
+  .filter-controls {
+    padding: 3rem;
+  }
 
-  .edit-button {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-    min-width: 60px;
+  .app-header h1 {
+    font-size: 3.5rem;
+  }
+
+  .stats {
+    gap: 3rem;
+  }
+
+  .stat {
+    min-width: 200px;
+    padding: 0.75rem 1.5rem;
+  }
+
+  th, td {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .filter-row {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2.5rem;
   }
 }
 
-/* ===== PRINT STYLES ===== */
-@media print {
-  .app-header {
-    background: white !important;
-    color: black !important;
-    box-shadow: none;
-  }
-
-  .filter-controls,
-  .edit-button,
-  .modal-overlay {
-    display: none !important;
-  }
-
-  .classification-table {
-    box-shadow: none;
-    border: 1px solid #ccc;
-  }
-
+/* ===== ULTRA WIDE MONITORS (2560px+) ===== */
+@media (min-width: 2560px) {
   .app-main {
-    padding: 1rem;
+    max-width: 2800px;
+    padding: 4rem 6rem;
   }
 
-  table {
-    display: table !important;
+  .filter-controls {
+    padding: 4rem;
   }
 
-  .mobile-cards {
-    display: none !important;
+  .app-header h1 {
+    font-size: 4rem;
+  }
+
+  .stats {
+    gap: 4rem;
+  }
+
+  .stat {
+    min-width: 220px;
+    padding: 1rem 2rem;
+  }
+
+  .filter-row {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3rem;
+  }
+
+  th, td {
+    padding: 2rem 1.5rem;
+  }
+}
+/* ===== UNDO NOTIFICATION STYLES ===== */
+.undo-notification {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: #2d3748;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  animation: slideInDown 0.3s ease-out;
+  max-width: 400px;
+  min-width: 300px;
+}
+
+.undo-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.undo-message {
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.undo-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.undo-button {
+  background: #4a5568;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.undo-button:hover {
+  background: #1a202c;
+  transform: translateY(-1px);
+}
+
+.dismiss-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.dismiss-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .undo-notification {
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+    min-width: auto;
+  }
+
+  .undo-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .undo-message {
+    text-align: center;
+  }
+
+  .undo-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .undo-button {
+    flex: 1;
+    max-width: 150px;
   }
 }

@@ -59,6 +59,18 @@ export const updateClassification = async (id, updates) => {
 };
 
 /**
+ * NEW: Undo a classification change
+ */
+export const undoClassification = async (id) => {
+    try {
+        const response = await api.post(`/classifications/${id}/undo`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to undo changes');
+    }
+};
+
+/**
  * Health check
  */
 export const healthCheck = async () => {
