@@ -1,29 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { getClassifications, healthCheck } from './services/api';
+import ClassificationTable from './components/ClassificationTable';
+import { getClassifications, updateClassification } from './services/api';
 import './App.css';
 
 function App() {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [healthStatus, setHealthStatus] = useState(null);
 
-    // Test API connection on component mount
+    // Load documents on component mount
     useEffect(() => {
-        testAPIConnection();
         loadDocuments();
     }, []);
-
-    const testAPIConnection = async () => {
-        try {
-            const health = await healthCheck();
-            setHealthStatus(health);
-            console.log('✅ Backend connection successful:', health);
-        } catch (err) {
-            console.error('❌ Backend connection failed:', err);
-            setError('Failed to connect to backend server');
-        }
-    };
 
     const loadDocuments = async () => {
         try {
@@ -31,13 +19,40 @@ function App() {
             const response = await getClassifications();
             setDocuments(response.data);
             setError(null);
-            console.log('📄 Loaded documents:', response.data.length);
         } catch (err) {
             setError('Failed to load documents');
             console.error('Error loading documents:', err);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleUpdateClassification = async (documentId, newClassifications) => {
+        try {
+            const updatedDoc = await updateClassification(documentId, {
+                classifications: newClassifications
+            });
+
+            // Update local state
+            setDocuments(prev =>
+                prev.map(doc =>
+                    doc.id === documentId ? updatedDoc.data : doc
+                )
+            );
+
+            return true;
+        } catch (err) {
+            console.error('Error updating classification:', err);
+            setError('Failed to update classification');
+            return false;
+        }
+    };
+
+    const getLowConfidenceCount = () => {
+        return documents.filter(doc => {
+            const maxScore = Math.max(...doc.classifications.map(c => c.score));
+            return maxScore < 0.7;
+        }).length;
     };
 
     if (loading) {
@@ -55,11 +70,17 @@ function App() {
         <div className="app">
             <header className="app-header">
                 <h1>Document Classifier Dashboard</h1>
-                {healthStatus && (
-                    <div className="health-status">
-                        <p>✅ Backend: {healthStatus.status} | Documents: {healthStatus.documents_count}</p>
-                    </div>
-                )}
+                <div className="stats">
+                    <span className="stat">
+                        <strong>{documents.length}</strong> Total Documents
+                    </span>
+                    <span className="stat">
+                        <strong>{getLowConfidenceCount()}</strong> Low Confidence
+                    </span>
+                    <span className="stat">
+                        <strong>{documents.filter(d => d.manually_edited).length}</strong> Manually Edited
+                    </span>
+                </div>
             </header>
 
             {error && (
@@ -70,37 +91,10 @@ function App() {
             )}
 
             <main className="app-main">
-                <div className="documents-preview">
-                    <h2>Loaded Documents ({documents.length})</h2>
-
-                    {documents.length === 0 ? (
-                        <p>No documents found.</p>
-                    ) : (
-                        <div className="documents-list">
-                            {documents.slice(0, 5).map((doc) => (
-                                <div key={doc.id} className="document-item">
-                                    <h3>{doc.document_name}</h3>
-                                    <p>Primary: {doc.classifications[0]?.label} ({(doc.classifications[0]?.score * 100).toFixed(1)}%)</p>
-                                    <p>Status: {doc.manually_edited ? '✏️ Edited' : '🤖 Original'}</p>
-                                </div>
-                            ))}
-                            {documents.length > 5 && (
-                                <p>... and {documents.length - 5} more documents</p>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                <div className="next-steps">
-                    <h3>🚧 Development Status</h3>
-                    <ul>
-                        <li>✅ Backend API connection</li>
-                        <li>✅ Data loading</li>
-                        <li>🚧 Table component (next)</li>
-                        <li>🚧 Filter controls (next)</li>
-                        <li>🚧 Edit modal (next)</li>
-                    </ul>
-                </div>
+                <ClassificationTable
+                    documents={documents}
+                    onUpdateClassification={handleUpdateClassification}
+                />
             </main>
         </div>
     );
