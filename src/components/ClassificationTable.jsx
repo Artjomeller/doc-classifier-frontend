@@ -156,7 +156,6 @@ const ClassificationTable = ({ documents, onUpdateClassification }) => {
                                                 className="low-confidence-indicator"
                                                 title="Low confidence classification"
                                             >
-                                                ⚠️
                                             </span>
                                         )}
                                     </div>
@@ -188,7 +187,7 @@ const ClassificationTable = ({ documents, onUpdateClassification }) => {
                                     <div className="status-indicators">
                                         {document.manually_edited && (
                                             <span className="edited-badge" title="Manually edited">
-                                                ✏️ Edited
+                                                Edited
                                             </span>
                                         )}
                                         <span
